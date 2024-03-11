@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#define MAX_ATTEMPTS 10
+
 int main() {
     int secretNumber, guess, attempts = 0;
     srand(time(0)); // Seed the random number generator
@@ -22,6 +24,14 @@ int main() {
             printf("C'est plus !\n");
         } else {
             printf("Félicitations ! Vous avez trouvé le nombre secret en %d tentatives.\n", attempts);
+            break;
+        }
+
+        if (attempts >= MAX_ATTEMPTS) {
+            printf("Vous avez dépassé le nombre maximum d'essais. Vous avez perdu ! Le nombre secret était : %d\n", secretNumber);
+            break;
+        } else {
+            printf("Il vous reste %d tentative(s).\n", MAX_ATTEMPTS - attempts);
         }
     } while (guess != secretNumber);
 
