@@ -6,34 +6,42 @@
 
 int main() {
     int secretNumber, guess, attempts = 0;
+    char playAgain;
     srand(time(0)); // Seed the random number generator
 
-    // Generate a random number between 1 and 100
-    secretNumber = rand() % 100 + 1;
-
-    printf("Bienvenue dans le jeu Plus ou Moins !\n");
-
     do {
-        printf("Devinez le nombre secret (entre 1 et 100) : ");
-        scanf("%d", &guess);
-        attempts++;
+        // Generate a random number between 1 and 100
+        secretNumber = rand() % 100 + 1;
 
-        if (guess > secretNumber) {
-            printf("C'est moins !\n");
-        } else if (guess < secretNumber) {
-            printf("C'est plus !\n");
-        } else {
-            printf("Félicitations ! Vous avez trouvé le nombre secret en %d tentatives.\n", attempts);
-            break;
-        }
+        printf("Bienvenue dans le jeu Plus ou Moins !\n");
 
-        if (attempts >= MAX_ATTEMPTS) {
-            printf("Vous avez dépassé le nombre maximum d'essais. Vous avez perdu ! Le nombre secret était : %d\n", secretNumber);
-            break;
-        } else {
-            printf("Il vous reste %d tentative(s).\n", MAX_ATTEMPTS - attempts);
-        }
-    } while (guess != secretNumber);
+        do {
+            printf("Devinez le nombre secret (entre 1 et 100) : ");
+            scanf("%d", &guess);
+            attempts++;
+
+            if (guess > secretNumber) {
+                printf("C'est moins !\n");
+            } else if (guess < secretNumber) {
+                printf("C'est plus !\n");
+            } else {
+                printf("Félicitations ! Vous avez trouvé le nombre secret en %d tentatives.\n", attempts);
+                break;
+            }
+
+            if (attempts >= MAX_ATTEMPTS) {
+                printf("Vous avez dépassé le nombre maximum d'essais. Vous avez perdu ! Le nombre secret était : %d\n", secretNumber);
+                break;
+            } else {
+                printf("Il vous reste %d tentative(s).\n", MAX_ATTEMPTS - attempts);
+            }
+        } while (guess != secretNumber);
+
+        printf("Voulez-vous recommencer ? (O/N) : ");
+        scanf(" %c", &playAgain);
+        attempts = 0; // Reset the number of attempts
+
+    } while (playAgain == 'O' || playAgain == 'o');
 
     return 0;
 }
