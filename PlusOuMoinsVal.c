@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <ctype.h>
 
 #define MAX_ATTEMPTS 10
 #define MAX_GUESSES 100
@@ -15,20 +16,17 @@ int main() {
 
     printf("Bienvenue dans le jeu Plus ou Moins !\n");
     printf("Entrez la limite minimale : ");
-    scanf("%d", &minLimit);
+    while (scanf("%d", &minLimit) != 1) {
+        printf("Veuillez entrer un entier valide pour la limite minimale : ");
+        while (getchar() != '\n'); // Clear input buffer
+    }
     printf("Entrez la limite maximale : ");
-    scanf("%d", &maxLimit);
+    while (scanf("%d", &maxLimit) != 1) {
+        printf("Veuillez entrer un entier valide pour la limite maximale : ");
+        while (getchar() != '\n'); // Clear input buffer
+    }
 
     do {
-        if (numGuesses > 0) {
-            printf("Reprise du jeu...\n");
-            printf("Vos tentatives précédentes : ");
-            for (int i = 0; i < numGuesses; i++) {
-                printf("%d ", guesses[i]);
-            }
-            printf("\n");
-        }
-
         // Generate a random number between minLimit and maxLimit
         secretNumber = rand() % (maxLimit - minLimit + 1) + minLimit;
 
@@ -72,7 +70,26 @@ int main() {
         scanf(" %c", &playAgain);
         attempts = 0; // Reset the number of attempts
 
-    } while (playAgain == 'O' || playAgain == 'o');
+        if (tolower(playAgain) == 'o') {
+            printf("Entrez la nouvelle limite minimale : ");
+            while (scanf("%d", &minLimit) != 1) {
+                printf("Veuillez entrer un entier valide pour la limite minimale : ");
+                while (getchar() != '\n'); // Clear input buffer
+            }
+            printf("Entrez la nouvelle limite maximale : ");
+            while (scanf("%d", &maxLimit) != 1) {
+                printf("Veuillez entrer un entier valide pour la limite maximale : ");
+                while (getchar() != '\n'); // Clear input buffer
+            }
+        }
+
+    } while (tolower(playAgain) == 'o');
+
+    printf("Les nombres que vous avez devinés sont : ");
+    for (int i = 0; i < numGuesses; i++) {
+        printf("%d ", guesses[i]);
+    }
+    printf("\n");
 
     return 0;
 }
