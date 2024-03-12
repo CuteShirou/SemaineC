@@ -1,2 +1,5 @@
 # SemaineC
-On est la
+
+Projet : 
+- Plus ou moins
+- Demineur
