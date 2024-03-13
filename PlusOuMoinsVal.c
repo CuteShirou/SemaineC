@@ -6,6 +6,10 @@
 #define MAX_ATTEMPTS 10
 #define MAX_GUESSES 100
 
+void Clearbuffer() {
+    while (getchar() != '\n');
+}
+
 int main() {
     int secretNumber, guess, attempts = 0;
     int minLimit, maxLimit;
@@ -18,12 +22,12 @@ int main() {
     printf("Entrez la limite minimale : ");
     while (scanf("%d", &minLimit) != 1) {
         printf("Veuillez entrer un entier valide pour la limite minimale : ");
-        while (getchar() != '\n'); // Clear input buffer
+        Clearbuffer();
     }
     printf("Entrez la limite maximale : ");
     while (scanf("%d", &maxLimit) != 1) {
         printf("Veuillez entrer un entier valide pour la limite maximale : ");
-        while (getchar() != '\n'); // Clear input buffer
+        Clearbuffer();
     }
 
     do {
@@ -34,7 +38,7 @@ int main() {
         do {
             while (scanf("%d", &guess) != 1 || guess < minLimit || guess > maxLimit) {
                 printf("Veuillez entrer un entier valide entre %d et %d : ", minLimit, maxLimit);
-                while (getchar() != '\n'); // Clear input buffer
+                Clearbuffer();
             }
             attempts++;
 
@@ -74,12 +78,12 @@ int main() {
             printf("Entrez la nouvelle limite minimale : ");
             while (scanf("%d", &minLimit) != 1) {
                 printf("Veuillez entrer un entier valide pour la limite minimale : ");
-                while (getchar() != '\n'); // Clear input buffer
+                Clearbuffer();
             }
             printf("Entrez la nouvelle limite maximale : ");
             while (scanf("%d", &maxLimit) != 1) {
                 printf("Veuillez entrer un entier valide pour la limite maximale : ");
-                while (getchar() != '\n'); // Clear input buffer
+                Clearbuffer();
             }
         }
 
