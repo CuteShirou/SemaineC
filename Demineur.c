@@ -32,7 +32,21 @@ void placeMines(Grid* grid, int numberOfMines) {
     for (int i = 0; i < numberOfMines; i++) {
         int x = rand() % grid->size;
         int y = rand() % grid->size;
-        grid->tiles[x][y].value = MINE;
+        if (grid->tiles[x][y].value != MINE) {
+            grid->tiles[x][y].value = MINE;
+            // Increment mine counters for adjacent tiles
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    if (nx >= 0 && nx < grid->size && ny >= 0 && ny < grid->size && grid->tiles[nx][ny].value != MINE) {
+                        grid->tiles[nx][ny].value++;
+                    }
+                }
+            }
+        } else {
+            i--;
+        }
     }
 }
 
@@ -53,15 +67,21 @@ void printGrid(Grid* grid) {
     }
 }
 
-void getUserInput(int* x, int* y) {
-    printf("Enter coordinates (x y): ");
-    scanf("%d %d", x, y);
-}
-
 void revealTile(Grid* grid, int x, int y) {
-    if (x >= 0 && x < grid->size && y >= 0 && y < grid->size) {
+    if (x >= 0 && x < grid->size && y >= 0 && y < grid->size && !grid->tiles[x][y].revealed) {
         grid->tiles[x][y].revealed = 1;
-        if (grid->tiles[x][y].value == MINE) {
+        if (grid->tiles[x][y].value == 0) {
+            // Automatically reveal adjacent empty tiles
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    if (nx >= 0 && nx < grid->size && ny >= 0 && ny < grid->size) {
+                        revealTile(grid, nx, ny);
+                    }
+                }
+            }
+        } else if (grid->tiles[x][y].value == MINE) {
             printf("Game Over!\n");
             for (int i = 0; i < grid->size; i++) {
                 for (int j = 0; j < grid->size; j++) {
@@ -76,8 +96,14 @@ void revealTile(Grid* grid, int x, int y) {
 }
 
 int isGameWon(Grid* grid) {
-    // TODO: Implement this function
-    return 0;
+    for (int i = 0; i < grid->size; i++) {
+        for (int j = 0; j < grid->size; j++) {
+            if (grid->tiles[i][j].value != MINE && !grid->tiles[i][j].revealed) {
+                return 0;
+            }
+        }
+    }
+    return 1;
 }
 
 void gameLoop(Grid* grid) {
@@ -99,4 +125,4 @@ int main() {
     placeMines(&grid, 10);
     gameLoop(&grid);
     return 0;
-}
+}   // End of code
