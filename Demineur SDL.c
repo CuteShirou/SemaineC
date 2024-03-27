@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -229,4 +230,132 @@ int main() {
   }
   clearScreen();
   return 0;
-} // End of code
+}
+
+void drawGrid(SDL_Renderer *renderer, Grid *grid, int tileSize) {
+  const SDL_Color colors[] = {
+      {0, 0, 0, 255},       // Black
+      {0, 255, 0, 255},     // Green
+      {226, 38, 0, 255},    // Red
+      {214, 38, 0, 255},    // Orange
+      {208, 38, 0, 255},    // Dark Orange
+      {183, 38, 0, 255},    // Dark Red
+      {141, 38, 0, 255},    // Dark Red
+      {0, 0, 0, 255},       // Black
+      {0, 0, 0, 255}        // Black
+  };
+
+  for (int i = 0; i < grid->size; i++) {
+    for (int j = 0; j < grid->size; j++) {
+      SDL_Rect rect = {j * tileSize, i * tileSize, tileSize, tileSize};
+      if (grid->tiles[i][j].revealed) {
+        if (grid->tiles[i][j].value == MINE) {
+          SDL_SetRenderDrawColor(renderer, colors[2].r, colors[2].g, colors[2].b, colors[2].a);
+        } else if (grid->tiles[i][j].value >= 0) {
+          SDL_SetRenderDrawColor(renderer, colors[grid->tiles[i][j].value].r, colors[grid->tiles[i][j].value].g, colors[grid->tiles[i][j].value].b, colors[grid->tiles[i][j].value].a);
+        }
+      } else if (grid->tiles[i][j].flag) {
+        SDL_SetRenderDrawColor(renderer, colors[7].r, colors[7].g, colors[7].b, colors[7].a);
+      } else {
+        SDL_SetRenderDrawColor(renderer, colors[8].r, colors[8].g, colors[8].b, colors[8].a);
+      }
+      SDL_RenderFillRect(renderer, &rect);
+    }
+  }
+}
+
+void gameLoop(Grid *grid, SDL_Renderer *renderer, int tileSize) {
+  int *x = malloc(sizeof(int));
+  int *y = malloc(sizeof(int));
+  char drapeau = 'n';
+  while (1) {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_QUIT) {
+        endgame(x, y, grid);
+        return;
+      }
+      if (event.type == SDL_MOUSEBUTTONDOWN) {
+        int mouseX, mouseY;
+        SDL_GetMouseState(&mouseX, &mouseY);
+        *x = mouseY / tileSize;
+        *y = mouseX / tileSize;
+        if (event.button.button == SDL_BUTTON_LEFT) {
+          drapeau = 'n';
+        } else if (event.button.button == SDL_BUTTON_RIGHT) {
+          drapeau = 'o';
+        }
+        revealTile(grid, *x, *y, x, y, drapeau);
+        if (isGameWin(grid)) {
+          endgame(x, y, grid);
+          printf("gg you win\n");
+          return;
+        }
+        if (isGameLost(grid)) {
+          endgame(x, y, grid);
+          printf("F you lose\n");
+          return;
+        }
+      }
+    }
+    SDL_RenderClear(renderer);
+    drawGrid(renderer, grid, tileSize);
+    SDL_RenderPresent(renderer);
+  }
+}
+
+int main() {
+  // Initialize SDL
+  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    printf("SDL_Init Error: %s\n", SDL_GetError());
+    return 1;
+  }
+
+  // Create a window
+  SDL_Window *window = SDL_CreateWindow("Démineur", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 800, 800, 0);
+  if (window == NULL) {
+    printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
+    SDL_Quit();
+    return 1;
+  }
+
+  // Create a renderer
+  SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+  if (renderer == NULL) {
+    SDL_DestroyWindow(window);
+    printf("SDL_CreateRenderer Error: %s\n", SDL_GetError());
+    SDL_Quit();
+    return 1;
+  }
+
+  // Set the grid size and number of mines
+  Grid grid;
+  int nbrmines;
+  int taille;
+  char *rejouer[2];
+  while (1) {
+    clearScreen();
+    printf("de quel taille voulez vous que la grille soit ?\n");
+    scanf("%d", &taille);
+    ClearBuffer();
+    printf("combien de mine voulez vous ?\n");
+    scanf("%d", &nbrmines);
+    ClearBuffer();
+    initializeGrid(&grid, taille);
+    placeMines(&grid, nbrmines);
+    gameLoop(&grid, renderer, 800 / taille);
+    printf("voulez vous rejouer o/n\n");
+    scanf("%c", &rejouer);
+    ClearBuffer();
+    if (strcmp(rejouer, "n") == 0) {
+      break;
+    }
+  }
+
+  // Cleanup and quit SDL
+  SDL_DestroyRenderer(renderer);
+  SDL_DestroyWindow(window);
+  SDL_Quit();
+
+  return 0;
+}
